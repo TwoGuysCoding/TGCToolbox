@@ -10,7 +10,7 @@ from tgctoolbox import TGCLoggerSetup
 
 if PyAudio is None:
         raise ImportError("The 'audio' extras are required to use this feature. "
-                          "Install them with: pip install your_package[audio]")
+                          "Install them with: pip install tgctoolbox[audio]")
 
 # Constants for audio recording
 FORMAT = pyaudio.paInt16  # Audio format

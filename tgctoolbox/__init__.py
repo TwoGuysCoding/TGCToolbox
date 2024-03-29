@@ -26,7 +26,10 @@ from .ffmpeg import *
 from .operations import *
 
 # Importing recorder. Be warned that recorder function is just for testing here and is not robust at all.
-from .recorder import *
+try:
+    from .recorder import *
+except ImportError:
+    pass
 
 # Importing sound utils
 from .sound import *
