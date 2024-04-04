@@ -1,6 +1,7 @@
-import logging
 import inspect
+import logging
 from typing import Type
+
 
 class JacobsAmazingLoggerFormatter(logging.Formatter):
     """Logging Formatter to add colors to the levelname and include function name"""
@@ -18,7 +19,7 @@ class JacobsAmazingLoggerFormatter(logging.Formatter):
         logging.INFO: green,
         logging.WARNING: yellow,
         logging.ERROR: red,
-        logging.CRITICAL: red
+        logging.CRITICAL: red,
     }
 
     def format(self, record):
@@ -26,7 +27,10 @@ class JacobsAmazingLoggerFormatter(logging.Formatter):
         stack = inspect.stack()
         func_name = "unknown"
         for frame in stack:
-            if frame.function not in ["emit", "format"] and 'logging' not in frame.filename:
+            if (
+                frame.function not in ["emit", "format"]
+                and "logging" not in frame.filename
+            ):
                 func_name = frame.function
                 break
         record.func_name = func_name
@@ -34,40 +38,61 @@ class JacobsAmazingLoggerFormatter(logging.Formatter):
         # Colorize levelname
         color = self.LEVEL_COLORS.get(record.levelno, self.grey)
         record.levelname = color + record.levelname + self.reset
-        
-        if hasattr(record, 'timespec'):
+
+        if hasattr(record, "timespec"):
             record.msg = self.light_blue + "TIMESPEC: " + self.reset + record.msg
             return super(JacobsAmazingLoggerFormatter, self).format(record)
-        
-        if hasattr(record, 'result'):
+
+        if hasattr(record, "result"):
             record.msg = self.light_blue + "RESULT: " + self.reset + record.msg
             return super(JacobsAmazingLoggerFormatter, self).format(record)
 
         # Set the format and return the formatted record
         self._style._fmt = "%(levelname)s: [%(func_name)s] %(asctime)s - %(message)s"
         return super(JacobsAmazingLoggerFormatter, self).format(record)
-    
-    
+
+
 class JacobsAmazingLogger(logging.Logger):
     def timespec(self, message, *args, **kwargs):
         # Add a custom attribute to the log record
         if self.isEnabledFor(logging.INFO):
             # Create a new record with a custom attribute
-            record = self.makeRecord(self.name, logging.INFO, "(unknown file)", 0, message, args, kwargs, None)
+            record = self.makeRecord(
+                self.name,
+                logging.INFO,
+                "(unknown file)",
+                0,
+                message,
+                args,
+                kwargs,
+                None,
+            )
             record.timespec = True
             self.handle(record)
-            
+
+
 class JacobsAmazingResultsLogger(logging.Logger):
     def result(self, message, *args, **kwargs):
         # Add a custom attribute to the log record
         if self.isEnabledFor(logging.INFO):
             # Create a new record with a custom attribute
-            record = self.makeRecord(self.name, logging.INFO, "(unknown file)", 0, message, args, kwargs, None)
+            record = self.makeRecord(
+                self.name,
+                logging.INFO,
+                "(unknown file)",
+                0,
+                message,
+                args,
+                kwargs,
+                None,
+            )
             record.result = True
             self.handle(record)
 
 
-def setup_custom_logger(name: str, level: str = 'INFO', logger = None) -> Type[logging.Logger]:
+def setup_custom_logger(
+    name: str, level: str = "INFO", logger=None
+) -> Type[logging.Logger]:
     """
     Set up and return a custom logger with the specified name and level.
 
@@ -90,5 +115,7 @@ def setup_custom_logger(name: str, level: str = 'INFO', logger = None) -> Type[l
 
 
 def log_result(message):
-    logger = setup_custom_logger(__name__, level='INFO', logger=JacobsAmazingResultsLogger(__name__))
+    logger = setup_custom_logger(
+        __name__, level="INFO", logger=JacobsAmazingResultsLogger(__name__)
+    )
     logger.result(message)

@@ -1,18 +1,21 @@
-from ast import Dict
-import os
 import glob
 import logging
-from typing import Dict
+import os
 import tempfile
+from ast import Dict
+from typing import Dict
+
 from tgctoolbox import TGCLoggerSetup
 
 logger = TGCLoggerSetup(__name__)
 
-def dir_size_adjust(dir_path: str, 
-                    num_files : int = 10, 
-                    size_limit : int = 100000000, 
-                    logger: logging.Logger = logger):
-    
+
+def dir_size_adjust(
+    dir_path: str,
+    num_files: int = 10,
+    size_limit: int = 100000000,
+    logger: logging.Logger = logger,
+):
     """_summary_: Adjusts the number of files in the directory to 10 by deleting the oldest files.
 
     Args:
@@ -48,10 +51,8 @@ def dir_size_adjust(dir_path: str,
         logger.error("An unexpected error occurred in dir_size_adjust", exc_info=True)
     return False
 
-def dict_size_adjust(dict : Dict, 
-                     num_items : int = 10, 
-                     logger: logging.Logger = logger):
-    
+
+def dict_size_adjust(dict: Dict, num_items: int = 10, logger: logging.Logger = logger):
     """_summary_: Adjusts the number of items in the dictionary to 10 by deleting the oldest items.
 
     Args:
@@ -60,7 +61,7 @@ def dict_size_adjust(dict : Dict,
     """
     try:
         keys = list(dict.keys())
-        keys.sort(key=lambda x: dict[x]['timestamp'])
+        keys.sort(key=lambda x: dict[x]["timestamp"])
         if len(dict) > num_items:
             for i in range(len(dict) - num_items):
                 logger.info(f"Removed task {keys[i]}")
@@ -69,10 +70,13 @@ def dict_size_adjust(dict : Dict,
         else:
             return True
     except Exception as e:
-        logger.error(f"An unexpected error occurred in dict_size_adjust: {e}", exc_info=True)
+        logger.error(
+            f"An unexpected error occurred in dict_size_adjust: {e}", exc_info=True
+        )
         return False
 
-def save_temp_file(audio_data: bytes, file_extension: str = 'wav') -> str:
+
+def save_temp_file(audio_data: bytes, file_extension: str = "wav") -> str:
     """
     Save the audio data to a temporary file and return the file path.
 
@@ -83,11 +87,12 @@ def save_temp_file(audio_data: bytes, file_extension: str = 'wav') -> str:
     Returns:
     str: The path to the temporary audio file.
     """
-    temp_file, temp_file_path = tempfile.mkstemp(suffix=f'.{file_extension}')
-    with os.fdopen(temp_file, 'wb') as file:
+    temp_file, temp_file_path = tempfile.mkstemp(suffix=f".{file_extension}")
+    with os.fdopen(temp_file, "wb") as file:
         file.write(audio_data)
 
     return temp_file_path
+
 
 def get_file_extension(file_path: str) -> str:
     """

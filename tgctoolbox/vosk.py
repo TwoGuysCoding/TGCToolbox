@@ -1,16 +1,24 @@
-import vosk
-from vosk import KaldiRecognizer
 import json
 import logging
+
+import vosk
+from vosk import KaldiRecognizer
+
 from tgctoolbox import TGCLoggerSetup
 
 # Initialize logger
 logger = TGCLoggerSetup("vosk", level="INFO")
 
-def transcribe_vosk(audio_data, kaldi_recognizer: KaldiRecognizer = None, verbose=False, include_partial=False):
+
+def transcribe_vosk(
+    audio_data,
+    kaldi_recognizer: KaldiRecognizer = None,
+    verbose=False,
+    include_partial=False,
+):
     """
     Transcribe audio data using the Vosk model.
-    
+
     Args:
         audio_data: The audio data to be transcribed.
         kaldi_recognizer (KaldiRecognizer): The KaldiRecognizer instance.
@@ -18,7 +26,7 @@ def transcribe_vosk(audio_data, kaldi_recognizer: KaldiRecognizer = None, verbos
 
     Returns:
         The transcription result as a string.
-    
+
     Raises:
         ValueError: If Kaldi recognizer is not specified or audio data is invalid.
     """
@@ -35,18 +43,18 @@ def transcribe_vosk(audio_data, kaldi_recognizer: KaldiRecognizer = None, verbos
 
     # Set logging level
     vosk.SetLogLevel(0 if verbose else -1)
-    
+
     # Start transcription variable
-    transcription = ''
-    
+    transcription = ""
+
     try:
         # Process audio data and transcribe
         if kaldi_recognizer.AcceptWaveform(audio_data):
             result = json.loads(kaldi_recognizer.Result())
-            transcription = result.get('text', '')
+            transcription = result.get("text", "")
         elif include_partial:
             partial_result = json.loads(kaldi_recognizer.PartialResult())
-            transcription = partial_result.get('partial', '')
+            transcription = partial_result.get("partial", "")
 
         return transcription
 

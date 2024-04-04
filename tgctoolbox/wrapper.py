@@ -1,6 +1,9 @@
-import warnings
 import functools
-from colorama import Fore, Style
+import warnings
+
+from colorama import Fore
+from colorama import Style
+
 
 def custom_formatwarning(msg, *args, **kwargs):
     """
@@ -19,7 +22,9 @@ def custom_formatwarning(msg, *args, **kwargs):
     """
     return f"{Fore.YELLOW}WARNING: {Style.RESET_ALL}{str(msg)}\n"
 
+
 warnings.formatwarning = custom_formatwarning
+
 
 def experimental_feature(func):
     """
@@ -48,7 +53,10 @@ def experimental_feature(func):
         Returns:
             The result of the wrapped function call.
         """
-        warnings.warn(f"[{func.__name__}] This is an experimental feature and may change in the future.", UserWarning)
+        warnings.warn(
+            f"[{func.__name__}] This is an experimental feature and may change in the future.",
+            UserWarning,
+        )
         return func(*args, **kwargs)
-    
+
     return wrapper

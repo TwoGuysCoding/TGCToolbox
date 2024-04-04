@@ -1,16 +1,30 @@
-import requests
+import argparse
 import asyncio
 import os
-import argparse
+
+import requests
+
 from tgctoolbox import TGCLoggerSetup
 
 # Argument Parsing
-parser = argparse.ArgumentParser(description="Check if a server is up with a maximum number of retries.")
-parser.add_argument("--retries", type=int, default=5, help="Maximum number of retries to check if the server is up.")
-parser.add_argument("--host", type=str, default='localhost', help="Host of the server to check.")
-parser.add_argument("--port", type=int, default=8000, help="Port of the server to check.")
+parser = argparse.ArgumentParser(
+    description="Check if a server is up with a maximum number of retries."
+)
+parser.add_argument(
+    "--retries",
+    type=int,
+    default=5,
+    help="Maximum number of retries to check if the server is up.",
+)
+parser.add_argument(
+    "--host", type=str, default="localhost", help="Host of the server to check."
+)
+parser.add_argument(
+    "--port", type=int, default=8000, help="Port of the server to check."
+)
 
 logger = TGCLoggerSetup("wait_run")
+
 
 def is_server_up(host, port):
     """
@@ -39,6 +53,7 @@ def is_server_up(host, port):
     except Exception as e:
         return f"error: {str(e)}"
 
+
 async def wait_for_server(host, port, max_retries):
     """
     Asynchronously wait for a server to become available with a maximum retry limit.
@@ -59,14 +74,19 @@ async def wait_for_server(host, port, max_retries):
             logger.info(f"Server at {host}:{port} is up and running!")
             return
         elif status == "down":
-            logger.warning(f"Server at {host}:{port} is down. Retrying {retries+1}/{max_retries}...")
+            logger.warning(
+                f"Server at {host}:{port} is down. Retrying {retries+1}/{max_retries}..."
+            )
         else:  # Error case
-            logger.error(f"Server at {host}:{port} encountered an issue: {status}. Retrying {retries+1}/{max_retries}...")
+            logger.error(
+                f"Server at {host}:{port} encountered an issue: {status}. Retrying {retries+1}/{max_retries}..."
+            )
 
         retries += 1
         await asyncio.sleep(5)  # wait for 5 seconds before trying again
-    
+
     logger.warning("Maximum retries reached. Server is not up.")
+
 
 # Main Script
 if __name__ == "__main__":
@@ -79,7 +99,7 @@ if __name__ == "__main__":
     """
     args = parser.parse_args()
 
-    HOST = args.host if args.host is not None else os.environ.get("HOST", 'localhost')
+    HOST = args.host if args.host is not None else os.environ.get("HOST", "localhost")
     PORT = args.port if args.port is not None else os.environ.get("PORT", 8000)
     MAX_RETRIES = args.retries
 

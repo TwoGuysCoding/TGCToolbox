@@ -1,6 +1,10 @@
-from starlette.middleware.base import BaseHTTPMiddleware
 import time
-from tgctoolbox import TGCLogger, TGCLoggerSetup
+
+from starlette.middleware.base import BaseHTTPMiddleware
+
+from tgctoolbox import TGCLogger
+from tgctoolbox import TGCLoggerSetup
+
 
 class TimingMiddleware(BaseHTTPMiddleware):
     """
@@ -24,7 +28,9 @@ class TimingMiddleware(BaseHTTPMiddleware):
             app: The application instance to which this middleware is attached.
         """
         super().__init__(app)
-        self.logger = TGCLoggerSetup(__name__, level='DEBUG', logger=TGCLogger(__name__))
+        self.logger = TGCLoggerSetup(
+            __name__, level="DEBUG", logger=TGCLogger(__name__)
+        )
 
     async def dispatch(self, request, call_next):
         """
@@ -43,7 +49,9 @@ class TimingMiddleware(BaseHTTPMiddleware):
         start_time = time.time()
         response = await call_next(request)
         process_time = time.time() - start_time
-        self.logger.timespec(f"Request to {request.url.path} took {process_time:.2f} seconds")
+        self.logger.timespec(
+            f"Request to {request.url.path} took {process_time:.2f} seconds"
+        )
         return response
 
 
@@ -60,5 +68,5 @@ def log_time(start_time, end_time, message=None):
         message (str, optional): An optional message to include in the log. Defaults to None.
     """
     duration = end_time - start_time
-    logger = TGCLoggerSetup(__name__, level='DEBUG', logger=TGCLogger(__name__))
+    logger = TGCLoggerSetup(__name__, level="DEBUG", logger=TGCLogger(__name__))
     logger.timespec(f"{message}: {duration:.2f} seconds")

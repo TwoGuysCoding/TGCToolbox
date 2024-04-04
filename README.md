@@ -78,7 +78,7 @@ poetry add git+https://github.com/TwoGuysCoding/TGCToolbox.git#main
 
 This will add the TGC Toolbox to your `pyproject.toml` file and install it in your virtual environment.
 Note that it installs from a private repo and thus you must first set up your GitHub identification. Then, you can install the package by running:
-  
+
 ```shell
 poetry install
 ```

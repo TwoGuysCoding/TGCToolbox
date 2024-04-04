@@ -1,5 +1,6 @@
 try:
     import pyaudio
+
     PyAudio = pyaudio.PyAudio
 except ImportError:
     PyAudio = None
@@ -9,14 +10,16 @@ import time
 from tgctoolbox import TGCLoggerSetup
 
 if PyAudio is None:
-        raise ImportError("The 'audio' extras are required to use this feature. "
-                          "Install them with: pip install tgctoolbox[audio]")
+    raise ImportError(
+        "The 'audio' extras are required to use this feature. "
+        "Install them with: pip install tgctoolbox[audio]"
+    )
 
 # Constants for audio recording
 FORMAT = pyaudio.paInt16  # Audio format
-CHANNELS = 1              # Mono audio
-RATE = 16000              # Sampling rate
-CHUNK = 1024              # Frames per buffer
+CHANNELS = 1  # Mono audio
+RATE = 16000  # Sampling rate
+CHUNK = 1024  # Frames per buffer
 
 # WebSocket URL
 ws_url = "ws://localhost:8000/ws/transcribe_aai"
@@ -26,14 +29,17 @@ audio = pyaudio.PyAudio()
 
 logger = TGCLoggerSetup("recorder")
 
+
 # WebSocket client
 class WSClient(threading.Thread):
     def __init__(self, url):
         threading.Thread.__init__(self)
-        self.ws = websocket.WebSocketApp(url,
-                                         on_message=self.on_message,
-                                         on_error=self.on_error,
-                                         on_close=self.on_close)
+        self.ws = websocket.WebSocketApp(
+            url,
+            on_message=self.on_message,
+            on_error=self.on_error,
+            on_close=self.on_close,
+        )
         self.ws.on_open = self.on_open
         logger.info(f"WebSocket client initialized: {self.ws.__dict__}")
 
@@ -59,10 +65,11 @@ class WSClient(threading.Thread):
         logger.info("WebSocket opened")
         logger.info("WebSocket opened")
 
+
 def record_audio(ws_client):
-    stream = audio.open(format=FORMAT, channels=CHANNELS,
-                        rate=RATE, input=True,
-                        frames_per_buffer=CHUNK)
+    stream = audio.open(
+        format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK
+    )
 
     logger.info("Recording...")
 
@@ -70,13 +77,14 @@ def record_audio(ws_client):
         while True:
             data = stream.read(CHUNK)
             ws_client.send_audio(data)
-            
+
     except KeyboardInterrupt:
         logger.warning("Recording stopped by user request. Exiting...")
         stream.stop_stream()
         stream.close()
         audio.terminate()
         ws_client.ws.close()
+
 
 if __name__ == "__main__":
     ws_client = WSClient(ws_url)
