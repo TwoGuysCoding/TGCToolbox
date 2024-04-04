@@ -70,11 +70,26 @@ This module provides various wrappers.
 
 ## Installation
 
-To install the TGC Toolbox, you can use pip to install directly from the source:
+To install the TGC Toolbox, the prefered way is to use [poetry](https://python-poetry.org/docs/#installation):
+
+```shell
+poetry add git+https://github.com/TwoGuysCoding/TGCToolbox.git#main
+```
+
+This will add the TGC Toolbox to your `pyproject.toml` file and install it in your virtual environment.
+Note that it installs from a private repo and thus you must first set up your GitHub identification. Then, you can install the package by running:
+  
+```shell
+poetry install
+```
+
+Alternatively, you can use pip to install directly from the source:
 
 ```plaintext
 pip install git+https://github.com/TwoGuysCoding/tgc-toolbox.git#egg=tgc_toolbox
 ```
+
+WARNING: Install with pip uses the legacy version of this package, meaning it is not recommended and may not be supported.
 
 This will install the TGC Toolbox and all of its necessary Python dependencies directly from the private GitHub repository.
 
@@ -116,6 +131,14 @@ The necessary PortAudio binaries are typically included with the PyAudio package
 
 To include audio functionalities when installing from the private GitHub repository, you can specify the audio extras:
 
+- With Poetry:
+
+```shell
+poetry add git+https://github.com/TwoGuysCoding/TGCToolbox.git#main[audio]
+```
+
+- With pip:
+
 ```plaintext
 pip install "git+https://github.com/TwoGuysCoding/tgc-toolbox.git#egg=tgc_toolbox[audio]"
 ```
@@ -147,5 +170,3 @@ Please refer to the individual modules for more information on how to use the fu
 ## Contributing
 
 If you would like to contribute to the toolbox, please create a pull request with your changes. Make sure to include a detailed description of the changes you made and why you made them. Your pull request will be reviewed by the maintainers before being merged.
-
-It is generally encouraged to add any new tools or utilities that you think would be useful to the toolbox. However, please make sure that the tools are well-documented and tested before submitting a pull request.
