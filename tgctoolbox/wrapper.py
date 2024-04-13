@@ -1,8 +1,11 @@
 import functools
+import time
 import warnings
 
 from colorama import Fore
 from colorama import Style
+
+from .timing import log_time
 
 
 def custom_formatwarning(msg, *args, **kwargs):
@@ -58,5 +61,40 @@ def experimental_feature(func):
             UserWarning,
         )
         return func(*args, **kwargs)
+
+    return wrapper
+
+
+def timeit(func):
+    """
+    A decorator to measure the execution time of a function.
+
+    This decorator wraps a function and measures the time it takes to execute.
+    The duration is logged using the TGCLogger class.
+
+    Args:
+        func (Callable): The function to be decorated.
+
+    Returns:
+        Callable: The wrapped function with timing information.
+    """
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        """
+        Wrapper function to measure the execution time of the decorated function.
+
+        Args:
+            *args: Arguments passed to the function.
+            **kwargs: Keyword arguments passed to the function.
+
+        Returns:
+            The result of the wrapped function call.
+        """
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        log_time(start_time, end_time, f"Execution time for {func.__name__}")
+        return result
 
     return wrapper
