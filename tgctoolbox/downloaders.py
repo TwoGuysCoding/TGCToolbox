@@ -8,7 +8,7 @@ from moviepy.editor import AudioFileClip
 from pytube import YouTube
 from tqdm import tqdm
 
-from tgctoolbox import TGCLoggerSetup
+from .logger import setup_custom_logger as TGCLoggerSetup
 
 logger = TGCLoggerSetup(__name__)
 
