@@ -4,7 +4,7 @@ import os
 
 import requests
 
-from tgctoolbox import TGCLoggerSetup
+from .logger import setup_custom_logger as TGCLoggerSetup
 
 # Argument Parsing
 parser = argparse.ArgumentParser(

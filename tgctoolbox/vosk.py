@@ -4,7 +4,7 @@ import logging
 import vosk
 from vosk import KaldiRecognizer
 
-from tgctoolbox import TGCLoggerSetup
+from .logger import setup_custom_logger as TGCLoggerSetup
 
 # Initialize logger
 logger = TGCLoggerSetup("vosk", level="INFO")

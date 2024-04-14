@@ -1,7 +1,7 @@
 import subprocess
 import sys
 
-from tgctoolbox import TGCLoggerSetup
+from .logger import setup_custom_logger as TGCLoggerSetup
 
 logger = TGCLoggerSetup(__name__)
 
