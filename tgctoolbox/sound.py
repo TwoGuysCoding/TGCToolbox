@@ -1,3 +1,4 @@
+import contextlib
 import subprocess
 import wave
 
@@ -94,3 +95,29 @@ def resample_audio(input_path, output_path, sample_rate=16000):
         )
     except subprocess.CalledProcessError as e:
         print(f"An error occurred: {e}")
+
+
+def cut_wav_file(file_path, output_path, length_sec) -> None:
+    """Cut a WAV file to the specified length in seconds.
+
+    Args:
+    file_path (str): The path to the input WAV file.
+    output_path (str): The path to save the output WAV file.
+    length_sec (int): The desired length of the output file in seconds.
+    """
+    with contextlib.closing(wave.open(file_path, "rb")) as infile:
+        frame_rate = infile.getframerate()
+        n_channels = infile.getnchannels()
+        samp_width = infile.getsampwidth()
+        max_frames = int(frame_rate * length_sec)
+
+        # Ensure that the desired cut length does not exceed the file's length
+        max_frames = min(max_frames, infile.getnframes())
+
+        audio_data = infile.readframes(max_frames)
+
+        with wave.open(output_path, "wb") as outfile:
+            outfile.setnchannels(n_channels)
+            outfile.setsampwidth(samp_width)
+            outfile.setframerate(frame_rate)
+            outfile.writeframes(audio_data)
