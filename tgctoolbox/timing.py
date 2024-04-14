@@ -2,8 +2,8 @@ import time
 
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from tgctoolbox import TGCLogger
-from tgctoolbox import TGCLoggerSetup
+from .logger import JacobsAmazingLogger as TGCLogger
+from .logger import setup_custom_logger as TGCLoggerSetup
 
 
 class TimingMiddleware(BaseHTTPMiddleware):

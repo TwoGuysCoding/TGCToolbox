@@ -7,7 +7,7 @@ except ImportError:
 import websocket
 import threading
 import time
-from tgctoolbox import TGCLoggerSetup
+from .logger import setup_custom_logger as TGCLoggerSetup
 
 if PyAudio is None:
     raise ImportError(

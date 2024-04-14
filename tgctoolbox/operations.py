@@ -5,7 +5,7 @@ import tempfile
 from ast import Dict
 from typing import Dict
 
-from tgctoolbox import TGCLoggerSetup
+from .logger import setup_custom_logger as TGCLoggerSetup
 
 logger = TGCLoggerSetup(__name__)
 
