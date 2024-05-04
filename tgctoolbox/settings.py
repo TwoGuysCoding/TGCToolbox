@@ -16,16 +16,25 @@ BASE_FILES = [
 class Settings:
     """Class to manage application settings."""
 
-    def __init__(self, config_files=BASE_FILES):
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self, config_files=BASE_FILES, reload=False):
         """
         Initialize Settings object.
 
         Args:
             config_files (list): List of YAML configuration files.
         """
-        self._settings = {}
-        self._load_from_yaml(config_files)
-        self._load_from_env()
+        if not hasattr(self, "_initialized") or reload:
+            self._settings = {}
+            self._load_from_yaml(config_files)
+            self._load_from_env()
+            self._initialized = True
 
     def _load_from_yaml(self, config_files):
         """Load settings from YAML files."""
@@ -46,13 +55,9 @@ class Settings:
                 except yaml.YAMLError:
                     logger.warning(f"Error loading configuration file: {file}")
                     continue
-
-        # Logging all loaded settings outside the loop
         logger.info("Following settings were loaded from YAML files:")
         for name in settings_names:
             print(f"  - {name}")
-
-        # Updating self._settings with loaded settings
         self._settings.update(loaded_settings)
 
     def _load_from_env(self):
@@ -87,7 +92,9 @@ class Settings:
 # Example usage:
 if __name__ == "__main__":
     settings = Settings()
+    settings2 = Settings()
 
     # Accessing settings
     app_port = settings.get("app").get("port")
     print(f"App Port: {app_port}")
+    print(settings is settings2)
