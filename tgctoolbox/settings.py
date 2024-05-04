@@ -23,23 +23,25 @@ class Settings:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self, config_files=BASE_FILES, reload=False):
+    def __init__(self, config_files=None, reload=False):
         """
         Initialize Settings object.
 
         Args:
             config_files (list): List of YAML configuration files.
+            reload (bool): Whether to reload settings.
         """
         if not hasattr(self, "_initialized") or reload:
             self._settings = {}
+            config_files = config_files or BASE_FILES
             self._load_from_yaml(config_files)
             self._load_from_env()
             self._initialized = True
 
     def _load_from_yaml(self, config_files):
         """Load settings from YAML files."""
-        settings_names = []
         loaded_settings = {}
+        settings_names = []
         if config_files:
             for file in config_files:
                 try:
@@ -47,18 +49,17 @@ class Settings:
                         settings = yaml.safe_load(f)
                         if settings:
                             loaded_settings.update(settings)
-                            for key in settings.keys():
-                                settings_names.append(key)
+                            settings_names.extend(settings.keys())
                 except FileNotFoundError:
                     logger.warning(f"Configuration file not found: {file}")
                     continue
                 except yaml.YAMLError:
                     logger.warning(f"Error loading configuration file: {file}")
                     continue
+        self._settings.update(loaded_settings)
         logger.info("Following settings were loaded from YAML files:")
         for name in settings_names:
-            print(f"  - {name}")
-        self._settings.update(loaded_settings)
+            logger.info(f"  - {name}")
 
     def _load_from_env(self):
         """Load settings from environment variables."""
@@ -86,7 +87,13 @@ class Settings:
         Returns:
             The value of the setting if found, otherwise default value.
         """
-        return self._settings.get(key, default)
+        value = self._settings
+        for k in key.split("."):
+            if isinstance(value, dict) and k in value:
+                value = value[k]
+            else:
+                return default
+        return value
 
 
 # Example usage:
@@ -95,6 +102,6 @@ if __name__ == "__main__":
     settings2 = Settings()
 
     # Accessing settings
-    app_port = settings.get("app").get("port")
+    app_port = settings.get("app.port")
     print(f"App Port: {app_port}")
     print(settings is settings2)
