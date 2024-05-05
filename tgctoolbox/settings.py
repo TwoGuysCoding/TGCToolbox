@@ -74,7 +74,7 @@ class Settings(metaclass=SettingsMeta):
             if load_env:
                 self._load_from_env(env_prefix)
             self._initialized = True
-            self._set_settings(self._settings, REQUIRED_SETTINGS)
+            self._set_settings(REQUIRED_SETTINGS)
 
     def _set_settings(self, req_settings: List[str]):
         """Helper function to set required settings as named parameters of the class based on a setting dictionary."""
