@@ -12,7 +12,10 @@ from .logger import log_result as log_result
 from .logger import log_result as TGCLogResult
 from .logger import setup_custom_logger as TGCLoggerSetup
 from .operations import *
+from .settings import Settings as Settings
 from .vosk import transcribe_vosk as transcribe_vosk
+
+# Importing Settings class
 
 # Importing downloaders
 # Import vosk utils
