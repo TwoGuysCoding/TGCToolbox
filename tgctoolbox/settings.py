@@ -35,6 +35,7 @@ class Settings(metaclass=SettingsMeta):
         load_env: bool = False,
         base_dir: Optional[str] = None,
         config_files: Optional[List[str]] = None,
+        env_prefix: Optional[str] = None,
     ):
         """
         Initialize Settings object. Load settings from YAML files and environment variables.
@@ -50,6 +51,7 @@ class Settings(metaclass=SettingsMeta):
             load_env (bool): Load settings from environment variables. Default is False.
             base_dir (str): Path to the directory containing the YAML files. Default is 'configuration'.
             config_files (list): List of paths to the YAML files to load. By default, it loads 'base.yaml', 'local.yaml', and 'production.yaml'.
+            env_prefix (str): Prefix for environment variables. Default is 'VAR_'.
         """
         BASE_DIR = base_dir or "configuration"
         BASE_FILES = [
@@ -70,23 +72,24 @@ class Settings(metaclass=SettingsMeta):
             else:
                 self._load_from_yaml(config_files)
             if load_env:
-                self._load_from_env()
+                self._load_from_env(env_prefix)
             self._initialized = True
             self._set_settings(self._settings, REQUIRED_SETTINGS)
 
-    def _set_settings(self, settings, req_settings):
-        """Set settings from a dictionary."""
+    def _set_settings(self, req_settings: List[str]):
+        """Helper function to set required settings as named parameters of the class based on a setting dictionary."""
         for setting in req_settings:
             if not self.get(setting):
                 raise ValueError(f"Setting '{setting}' is required")
             else:
                 setattr(self, setting, self.get(setting))
 
-    def _load_from_yaml_predefined(self, dir_path):
+    def _load_from_yaml_predefined(self, dir_path: str):
         """Load settings from predefined YAML files.
 
         Note: This method chooses the YAML files based on the APP_ENVIRONMENT environment variable.
         APP_ENVIRONMENT can be 'local' or 'production'. If not set, 'local' is used by default.
+        This method utilizes more general _load_from_yaml method to load the settings and provides top-level logic to choose the YAML files.
 
         Args:
             dir_path (str): Path to the directory containing the YAML files.
@@ -102,8 +105,13 @@ class Settings(metaclass=SettingsMeta):
         FILES = [base_path, local_path if app_env == "local" else prod_path]
         self._load_from_yaml(FILES)
 
-    def _load_from_yaml(self, config_files):
-        """Load settings from YAML files."""
+    def _load_from_yaml(self, config_files: List[str]):
+        """Load settings from YAML files.
+        If a file is not found or an error occurs, it is logged and skipped.
+        Settings are stored in the _settings dictionary of the class, then further processed in the main class.
+
+        Note: This method does not throw exceptions if a file is not found or an error occurs, just warns the user about such occurence.
+        """
         loaded_settings = {}
         settings_names = []
         if config_files:
@@ -125,12 +133,15 @@ class Settings(metaclass=SettingsMeta):
         for name in settings_names:
             logger.info(f"  - {name}")
 
-    def _load_from_env(self):
-        """Load settings from environment variables."""
+    def _load_from_env(self, env_prefix: Optional[str] = None):
+        """Load settings from environment variables.
+        This method loads settings from environment variables that are prefixed with 'VAR_' as per convention.
+        """
         settings_names = []
+        prefix = env_prefix or "VAR_"
         for key, value in os.environ.items():
-            if key.startswith("VAR_"):
-                keys = key.split("_")[1:]  # Remove 'VAR_' prefix
+            if key.startswith(prefix):
+                keys = key.split("_")[1:]
                 settings_names.append(keys[-1])
                 current_level = self._settings
                 for k in keys[:-1]:
@@ -140,7 +151,7 @@ class Settings(metaclass=SettingsMeta):
         for name in settings_names:
             logger.info(f"  - {name}")
 
-    def get(self, key, default=None):
+    def get(self, key: str, default: Optional[str] = None):
         """
         Get the value of a setting.
 
