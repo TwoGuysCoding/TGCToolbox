@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "tgctoolbox"
-version = "0.2"
+version = "0.3"
 description = "Comprehensive toolbox with all of the utils and tools used in various TGC projects."
 authors = ["Jakub Muszyński <jakub.m.muszynski@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 pytube = "*"
 moviepy = "*"
 tqdm = "*"
