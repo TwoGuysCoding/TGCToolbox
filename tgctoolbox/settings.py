@@ -47,7 +47,6 @@ class Settings(metaclass=SettingsMeta):
         Args:
             load_predefined (bool): Load settings from predefined YAML files. Default is True.
             reload (bool): Whether to reload settings. Default is False.
-            load_env (bool): Load settings from environment variables. Default is False.
             base_dir (str): Path to the directory containing the YAML files. Default is 'configuration'.
             config_files (list): List of paths to the YAML files to load. By default, it loads 'base.yaml', 'local.yaml', and 'production.yaml'.
             env_prefix (str): Prefix for environment variables. Default is 'VAR_'.
@@ -75,7 +74,11 @@ class Settings(metaclass=SettingsMeta):
             self._set_settings(REQUIRED_SETTINGS)
 
     def _set_settings(self, req_settings: List[str]):
-        """Helper function to set required settings as named parameters of the class based on a setting dictionary."""
+        """Helper function to set required settings as named parameters of the class based on a setting dictionary.
+
+        Raises:
+            ValueError: If a required setting is not found.
+        """
         for setting in req_settings:
             if not self.get(setting):
                 raise ValueError(f"Setting '{setting}' is required")
@@ -91,6 +94,9 @@ class Settings(metaclass=SettingsMeta):
 
         Args:
             dir_path (str): Path to the directory containing the YAML files.
+
+        Raises:
+            ValueError: If APP_ENVIRONMENT is not 'local' or 'production'.
         """
         base_path = os.path.join(dir_path, "base.yaml")
         local_path = os.path.join(dir_path, "local.yaml")
