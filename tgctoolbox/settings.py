@@ -32,7 +32,6 @@ class Settings(metaclass=SettingsMeta):
         self,
         load_predefined: bool = True,
         reload: bool = False,
-        load_env: bool = False,
         base_dir: Optional[str] = None,
         config_files: Optional[List[str]] = None,
         env_prefix: Optional[str] = None,
@@ -71,8 +70,7 @@ class Settings(metaclass=SettingsMeta):
                 self._load_from_yaml_predefined(BASE_DIR)
             else:
                 self._load_from_yaml(config_files)
-            if load_env:
-                self._load_from_env(env_prefix)
+            self._load_from_env(env_prefix)
             self._initialized = True
             self._set_settings(REQUIRED_SETTINGS)
 
