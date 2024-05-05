@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tgctoolbox"
-version = "0.3"
+version = "0.4"
 description = "Comprehensive toolbox with all of the utils and tools used in various TGC projects."
 authors = ["Jakub Muszyński <jakub.m.muszynski@gmail.com>"]
 
