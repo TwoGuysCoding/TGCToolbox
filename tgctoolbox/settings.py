@@ -6,24 +6,27 @@ import yaml
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-BASE_FILES = [
-    os.path.join("configuration", "base.yaml"),
-    os.path.join("configuration", "local.yaml"),
-    os.path.join("configuration", "production.yaml"),
-]
 
-
-class Settings:
-    """Class to manage application settings."""
+class SettingsMeta(type):
+    """Metaclass to create a singleton Settings class."""
 
     _instance = None
 
-    def __new__(cls, *args, **kwargs):
+    def __call__(cls, *args, **kwargs):
+        """Create a new instance of the class if it doesn't exist, otherwise return the existing instance.
+
+        Returns:
+            The existing instance of the class.
+        """
         if cls._instance is None:
-            cls._instance = super().__new__(cls)
+            cls._instance = super().__call__(*args, **kwargs)
         return cls._instance
 
-    def __init__(self, config_files=None, reload=False):
+
+class Settings(metaclass=SettingsMeta):
+    """Class to manage application settings."""
+
+    def __init__(self, config_files=None, reload=False, load_env=False):
         """
         Initialize Settings object.
 
@@ -31,12 +34,32 @@ class Settings:
             config_files (list): List of YAML configuration files.
             reload (bool): Whether to reload settings.
         """
+        BASE_FILES = [
+            os.path.join("configuration", "base.yaml"),
+            os.path.join("configuration", "local.yaml"),
+            os.path.join("configuration", "production.yaml"),
+        ]
+
+        REQUIRED_SETTINGS = ["port", "host"]
+
         if not hasattr(self, "_initialized") or reload:
+            self.port = None
+            self.host = None
             self._settings = {}
             config_files = config_files or BASE_FILES
             self._load_from_yaml(config_files)
-            self._load_from_env()
+            if load_env:
+                self._load_from_env()
             self._initialized = True
+            self._set_settings(self._settings, REQUIRED_SETTINGS)
+
+    def _set_settings(self, settings, req_settings):
+        """Set settings from a dictionary."""
+        for setting in req_settings:
+            if not self.get(setting):
+                raise ValueError(f"Setting '{setting}' is required")
+            else:
+                setattr(self, setting, self.get(setting))
 
     def _load_from_yaml(self, config_files):
         """Load settings from YAML files."""
@@ -102,6 +125,7 @@ if __name__ == "__main__":
     settings2 = Settings()
 
     # Accessing settings
-    app_port = settings.get("app.port")
-    print(f"App Port: {app_port}")
+    app_port = settings.get("port")
+    app_host = settings.get("host")
+    print(f"App Port: {app_port}, App Host: {app_host}")
     print(settings is settings2)
