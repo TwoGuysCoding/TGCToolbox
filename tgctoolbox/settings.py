@@ -98,6 +98,10 @@ class Settings(metaclass=SettingsMeta):
         local_path = os.path.join(dir_path, "local.yaml")
         prod_path = os.path.join(dir_path, "production.yaml")
         app_env = os.environ.get("APP_ENVIRONMENT", "local")
+        if "APP_ENVIRONMENT" not in os.environ:
+            logger.warning(
+                "APP_ENVIRONMENT environment variable not set. Using 'local' by default."
+            )
         if app_env not in ["local", "production"]:
             raise ValueError(
                 "Invalid APP_ENVIRONMENT value. Use 'local' or 'production'."
